@@ -1,7 +1,6 @@
-import { useRef } from 'react';
 import { OptionType } from 'src/constants/articleProps';
 import { Text } from 'src/ui/text';
-import { useEnterSubmit } from './hooks/useEnterSubmit';
+import { BaseOption } from 'src/ui/common';
 
 import styles from './RadioGroup.module.scss';
 
@@ -10,37 +9,31 @@ type OptionProps = {
 	title: OptionType['title'];
 	selected: OptionType;
 	groupName: string;
-	onChange?: (option: OptionType) => void;
+	onChange: (option: OptionType) => void;
 	option: OptionType;
 };
 
 export const Option = (props: OptionProps) => {
 	const { value, title, selected, groupName, onChange, option } = props;
 
-	const optionRef = useRef<HTMLDivElement>(null);
-
-	const handleChange = () => onChange?.(option);
-
-	useEnterSubmit({ onChange, option });
-
 	const inputId = `${groupName}_radio_item_with_value__${value}`;
 	const isChecked = value === selected.value;
 
 	return (
-		<div
+		<BaseOption
+			option={option}
+			onChange={onChange}
+			isSelected={isChecked}
 			className={styles.item}
-			key={value}
-			data-checked={isChecked}
-			data-testid={inputId}
-			tabIndex={0}
-			ref={optionRef}>
+			selectAttribute="data-checked"
+			>
 			<input
 				className={styles.input}
 				type='radio'
 				name={groupName}
 				id={inputId}
 				value={value}
-				onChange={handleChange}
+				onChange={() => onChange?.(option)}
 				tabIndex={-1}
 			/>
 			<label className={styles.label} htmlFor={inputId}>
@@ -48,6 +41,6 @@ export const Option = (props: OptionProps) => {
 					{title}
 				</Text>
 			</label>
-		</div>
+		</BaseOption>
 	);
 };

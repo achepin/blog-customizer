@@ -7,7 +7,7 @@ import { RadioGroup } from 'src/ui/radio-group';
 import { Separator } from 'src/ui/separator';
 import { Text } from 'src/ui/text';
 import { useRef } from 'react';
-import { useOutsideClickClose } from 'src/ui/select/hooks/useOutsideClickClose';
+import { useClickOutside } from 'src/hooks';
 import {
     fontFamilyOptions,
     fontSizeOptions,
@@ -40,10 +40,10 @@ export const ArticleParamsForm = ({
     const formRef = useRef<HTMLDivElement>(null);
 
     // Обработка клика вне формы
-    useOutsideClickClose({
+    useClickOutside({
         isOpen,
-        rootRef: formRef,
-        onChange: (newValue) => {
+        targetRef: formRef,
+        onClickOutside: (newValue: boolean) => {
             if (!newValue && isOpen) {
                 onToggle();
             }
@@ -62,8 +62,7 @@ export const ArticleParamsForm = ({
             <aside ref={formRef} className={clsx(styles.container, { [styles.container_open]: isOpen })}>
                 <form className={styles.form} onSubmit={handleSubmit}>
                     <div>
-                        <Text size={22} weight={800}>Настройки</Text>
-                        <Separator />
+                        <Text size={31} weight={800}>ЗАДАЙТЕ ПАРАМЕТРЫ</Text>
 
                         <Select
                             title="Шрифт"
@@ -86,6 +85,9 @@ export const ArticleParamsForm = ({
                             options={fontColors}
                             onChange={(value) => onFormStateChange({ ...formState, fontColor: value })}
                         />
+                        <div style={{ marginBottom: '50px' }}>
+                            <Separator />
+                        </div>
 
                         <Select
                             title="Цвет фона"
@@ -94,9 +96,8 @@ export const ArticleParamsForm = ({
                             onChange={(value) => onFormStateChange({ ...formState, backgroundColor: value })}
                         />
 
-                        <RadioGroup
+                        <Select
                             title="Ширина контента"
-                            name="contentWidth"
                             selected={formState.contentWidth}
                             options={contentWidthArr}
                             onChange={(value) => onFormStateChange({ ...formState, contentWidth: value })}
