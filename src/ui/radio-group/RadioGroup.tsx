@@ -15,7 +15,11 @@ type RadioGroupProps = {
 export const RadioGroup = (props: RadioGroupProps) => {
 	const { name, options, selected, onChange, title } = props;
 
-	const handleChange = (option: OptionType) => onChange?.(option);
+	const handleChange = (option: OptionType) => {
+		if (onChange) {
+			onChange(option);
+		}
+	};
 
 	return (
 		<div className={styles.container}>

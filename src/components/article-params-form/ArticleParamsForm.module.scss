@@ -23,6 +23,10 @@
 	padding: 50px 31px;
 	background-color: #ffffff;
 	border-right: 1px solid #000000;
+
+	& > div > :global(*:not(:last-child)) {
+		margin-bottom: 50px;
+	}
 }
 
 .bottomContainer {

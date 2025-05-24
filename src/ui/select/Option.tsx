@@ -1,48 +1,29 @@
-import { useRef } from 'react';
-import type { MouseEventHandler } from 'react';
 import clsx from 'clsx';
 import { OptionType } from 'src/constants/articleProps';
 import { Text } from 'src/ui/text';
 import { isFontFamilyClass } from './helpers/isFontFamilyClass';
-import { useEnterOptionSubmit } from './hooks/useEnterOptionSubmit';
+import { BaseOption } from 'src/ui/common';
 
 import styles from './Select.module.scss';
 
 type OptionProps = {
 	option: OptionType;
-	onClick: (value: OptionType['value']) => void;
+	onClick: (option: OptionType) => void;
 };
 
-export const Option = (props: OptionProps) => {
-	const {
-		option: { value, title, optionClassName, className },
-		onClick,
-	} = props;
-	const optionRef = useRef<HTMLLIElement>(null);
-
-	const handleClick =
-		(clickedValue: OptionType['value']): MouseEventHandler<HTMLLIElement> =>
-		() => {
-			onClick(clickedValue);
-		};
-
-	useEnterOptionSubmit({
-		optionRef,
-		value,
-		onClick,
-	});
+export const Option = ({ option, onClick }: OptionProps) => {
+	const { value, title, optionClassName, className } = option;
 
 	return (
-		<li
+		<BaseOption
+			option={option}
+			onChange={onClick}
+			isSelected={false}
 			className={clsx(styles.option, styles[optionClassName || ''])}
-			value={value}
-			onClick={handleClick(value)}
-			tabIndex={0}
-			data-testid={`select-option-${value}`}
-			ref={optionRef}>
+			>
 			<Text family={isFontFamilyClass(className) ? className : undefined}>
 				{title}
 			</Text>
-		</li>
+		</BaseOption>
 	);
 };
