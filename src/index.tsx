@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client';
-import { StrictMode, CSSProperties, useState } from 'react';
+import { StrictMode, useState } from 'react';
 import clsx from 'clsx';
 
 import { Article } from './components/article/Article';
@@ -14,45 +14,21 @@ const domNode = document.getElementById('root') as HTMLDivElement;
 const root = createRoot(domNode);
 
 const App = () => {
-	// Состояние для примененных стилей статьи
+	// Состояние только для примененных стилей статьи
 	const [articleStyles, setArticleStyles] = useState<ArticleStateType>(defaultArticleState);
-
-	// Состояние для открытия/закрытия сайдбара
-	const [isFormOpen, setIsFormOpen] = useState(false);
-
-	// Состояние для временного хранения изменений в форме
-	const [formState, setFormState] = useState<ArticleStateType>(defaultArticleState);
 
 	const customStyles = useArticleCustomization(articleStyles);
 
-	// Обработчик открытия/закрытия сайдбара
-	const handleToggleForm = () => {
-		setIsFormOpen(!isFormOpen);
-	};
-
-	// Обработчик применения стилей из формы
-	const handleApplyStyles = (newStyles: ArticleStateType) => {
+	// Единственный обработчик для применения стилей
+	const handleStylesApply = (newStyles: ArticleStateType) => {
 		setArticleStyles(newStyles);
-	};
-
-	// Обработчик сброса настроек
-	const handleResetStyles = () => {
-		setFormState(defaultArticleState);
-		setArticleStyles(defaultArticleState);
 	};
 
 	return (
 		<main
 			className={clsx(styles.main)}
 			style={customStyles}>
-			<ArticleParamsForm
-				isOpen={isFormOpen}
-				onToggle={handleToggleForm}
-				formState={formState}
-				onFormStateChange={setFormState}
-				onApply={handleApplyStyles}
-				onReset={handleResetStyles}
-			/>
+			<ArticleParamsForm onStylesApply={handleStylesApply} />
 			<Article />
 		</main>
 	);

@@ -1,12 +1,12 @@
 import clsx from 'clsx';
-import { ArticleStateType } from 'src/constants/articleProps';
+import { ArticleStateType, defaultArticleState } from 'src/constants/articleProps';
 import { ArrowButton } from 'src/ui/arrow-button';
 import { Button } from 'src/ui/button';
 import { Select } from 'src/ui/select';
 import { RadioGroup } from 'src/ui/radio-group';
 import { Separator } from 'src/ui/separator';
 import { Text } from 'src/ui/text';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useClickOutside } from 'src/hooks';
 import {
     fontFamilyOptions,
@@ -18,34 +18,33 @@ import {
 
 import styles from './ArticleParamsForm.module.scss';
 
-// Интерфейс пропсов компонента
+// Интерфейс пропсов компонента - теперь требует только колбэк для применения стилей
 interface ArticleParamsFormProps {
-    isOpen: boolean;
-    onToggle: () => void;
-    formState: ArticleStateType;
-    onFormStateChange: (state: ArticleStateType) => void;
-    onApply: (state: ArticleStateType) => void;
-    onReset: () => void;
+    onStylesApply: (styles: ArticleStateType) => void;
 }
 
-export const ArticleParamsForm = ({
-    isOpen,
-    onToggle,
-    formState,
-    onFormStateChange,
-    onApply,
-    onReset
-}: ArticleParamsFormProps) => {
+export const ArticleParamsForm = ({ onStylesApply }: ArticleParamsFormProps) => {
+    // Внутреннее состояние для открытия/закрытия сайдбара
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    
+    // Внутреннее состояние для временного хранения изменений в форме
+    const [formState, setFormState] = useState<ArticleStateType>(defaultArticleState);
+
     // Реф для отслеживания кликов вне формы
     const formRef = useRef<HTMLDivElement>(null);
 
+    // Обработчик открытия/закрытия сайдбара
+    const handleToggleForm = () => {
+        setIsFormOpen(!isFormOpen);
+    };
+
     // Обработка клика вне формы
     useClickOutside({
-        isOpen,
+        isOpen: isFormOpen,
         targetRef: formRef,
         onClickOutside: (newValue: boolean) => {
-            if (!newValue && isOpen) {
-                onToggle();
+            if (!newValue && isFormOpen) {
+                handleToggleForm();
             }
         }
     });
@@ -53,13 +52,24 @@ export const ArticleParamsForm = ({
     // Обработчик отправки формы
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onApply(formState);
+        onStylesApply(formState);
+    };
+
+    // Обработчик сброса настроек
+    const handleReset = () => {
+        setFormState(defaultArticleState);
+        onStylesApply(defaultArticleState);
+    };
+
+    // Обработчик изменения состояния формы
+    const handleFormStateChange = (newState: ArticleStateType) => {
+        setFormState(newState);
     };
 
     return (
         <>
-            <ArrowButton isOpen={isOpen} onClick={onToggle} />
-            <aside ref={formRef} className={clsx(styles.container, { [styles.container_open]: isOpen })}>
+            <ArrowButton isOpen={isFormOpen} onClick={handleToggleForm} />
+            <aside ref={formRef} className={clsx(styles.container, { [styles.container_open]: isFormOpen })}>
                 <form className={styles.form} onSubmit={handleSubmit}>
                     <div>
                         <Text size={31} weight={800}>ЗАДАЙТЕ ПАРАМЕТРЫ</Text>
@@ -68,7 +78,7 @@ export const ArticleParamsForm = ({
                             title="Шрифт"
                             selected={formState.fontFamilyOption}
                             options={fontFamilyOptions}
-                            onChange={(value) => onFormStateChange({ ...formState, fontFamilyOption: value })}
+                            onChange={(value) => handleFormStateChange({ ...formState, fontFamilyOption: value })}
                         />
 
                         <RadioGroup
@@ -76,14 +86,14 @@ export const ArticleParamsForm = ({
                             name="fontSize"
                             selected={formState.fontSizeOption}
                             options={fontSizeOptions}
-                            onChange={(value) => onFormStateChange({ ...formState, fontSizeOption: value })}
+                            onChange={(value) => handleFormStateChange({ ...formState, fontSizeOption: value })}
                         />
 
                         <Select
                             title="Цвет шрифта"
                             selected={formState.fontColor}
                             options={fontColors}
-                            onChange={(value) => onFormStateChange({ ...formState, fontColor: value })}
+                            onChange={(value) => handleFormStateChange({ ...formState, fontColor: value })}
                         />
                         <div style={{ marginBottom: '50px' }}>
                             <Separator />
@@ -93,19 +103,19 @@ export const ArticleParamsForm = ({
                             title="Цвет фона"
                             selected={formState.backgroundColor}
                             options={backgroundColors}
-                            onChange={(value) => onFormStateChange({ ...formState, backgroundColor: value })}
+                            onChange={(value) => handleFormStateChange({ ...formState, backgroundColor: value })}
                         />
 
                         <Select
                             title="Ширина контента"
                             selected={formState.contentWidth}
                             options={contentWidthArr}
-                            onChange={(value) => onFormStateChange({ ...formState, contentWidth: value })}
+                            onChange={(value) => handleFormStateChange({ ...formState, contentWidth: value })}
                         />
                     </div>
 
                     <div className={styles.bottomContainer}>
-                        <Button title='Сбросить' htmlType='reset' type='clear' onClick={onReset} />
+                        <Button title='Сбросить' htmlType='reset' type='clear' onClick={handleReset} />
                         <Button title='Применить' htmlType='submit' type='apply' />
                     </div>
                 </form>
