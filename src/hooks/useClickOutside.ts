@@ -14,13 +14,14 @@ export const useClickOutside = ({
   onClose,
 }: UseClickOutsideProps) => {
   useEffect(() => {
+    // Не навешиваем обработчик, если форма закрыта
+    if (!isOpen) return;
+
     const handleClick = (event: MouseEvent) => {
       const { target } = event;
       if (target instanceof Node && !targetRef.current?.contains(target)) {
-        if (isOpen) {
-          onClose?.();
-          onClickOutside(false);
-        }
+        onClose?.();
+        onClickOutside(false);
       }
     };
 
@@ -29,5 +30,5 @@ export const useClickOutside = ({
     return () => {
       window.removeEventListener('mousedown', handleClick);
     };
-  }, [isOpen, onClose, onClickOutside]);
+  }, [isOpen, onClose, onClickOutside, targetRef]);
 };

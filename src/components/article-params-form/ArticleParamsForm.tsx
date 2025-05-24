@@ -26,7 +26,7 @@ interface ArticleParamsFormProps {
 export const ArticleParamsForm = ({ onStylesApply }: ArticleParamsFormProps) => {
     // Внутреннее состояние для открытия/закрытия сайдбара
     const [isFormOpen, setIsFormOpen] = useState(false);
-    
+
     // Внутреннее состояние для временного хранения изменений в форме
     const [formState, setFormState] = useState<ArticleStateType>(defaultArticleState);
 
